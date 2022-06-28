@@ -20,14 +20,9 @@ conda activate cellot
 conda update -n base -c defaults conda
 pip install --upgrade pip
 ```
-Activate the `conda` environment by calling
-```
-conda activate cellot
-```
-and install requirements and dependencies via:
+Install requirements and dependencies via:
 ```
 pip install -r requirements.txt
-python setup.py develop
 ```
 To install `CellOT` run:
 ```
