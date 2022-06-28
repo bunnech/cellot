@@ -1,15 +1,11 @@
 import cellot.models
 from cellot.data.cell import load_cell_data
-from cellot.data.toy import load_toy_data
 
 
 def load_data(config, **kwargs):
     data_type = config.get("data.type", "cell")
     if data_type in ["cell", "cell-merged", "tupro-cohort"]:
         loadfxn = load_cell_data
-
-    elif data_type == "toy":
-        loadfxn = load_toy_data
 
     else:
         raise ValueError

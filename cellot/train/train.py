@@ -5,7 +5,7 @@ import numpy as np
 from absl import logging
 from cellot import losses
 from cellot.utils.loaders import load
-from cellot.models.cellot import compute_loss_f, compute_loss_g, compute_w2_distance
+from cellot.models.cellot import compute_loss_f, compute_loss_g
 from cellot.train.summary import Logger
 from cellot.data.utils import cast_loader_to_iterator
 from cellot.models.ae import compute_scgen_shift
@@ -60,11 +60,7 @@ def train_cellot(outdir, config):
         with torch.no_grad():
             gl = compute_loss_g(f, g, source, transport).mean()
             fl = compute_loss_f(f, g, source, target, transport).mean()
-            dist = compute_w2_distance(f, g, source, target, transport)
             mmd = losses.compute_scalar_mmd(
-                target.detach().numpy(), transport.detach().numpy()
-            )
-            wst = losses.wasserstein_loss(
                 target.detach().numpy(), transport.detach().numpy()
             )
 
@@ -73,11 +69,10 @@ def train_cellot(outdir, config):
             "eval",
             gloss=gl.item(),
             floss=fl.item(),
-            jloss=dist.item(),
             mmd=mmd,
             step=step,
         )
-        check_loss(gl, gl, dist)
+        check_loss(gl, fl)
 
         return mmd
 
