@@ -40,6 +40,12 @@ python ./scripts/train.py --outdir ./results/4i/drug-cisplatin/model-cellot --co
 ```
 All scripts to reproduce the experiments in the i.i.d. (independent-and-identically-distributed), o.o.s. (out-of-sample), and o.o.d. (out-of-distribution) setting can be found in `scripts/submit`. More details on the method and experiments can be found in the [preprint](https://www.biorxiv.org/content/10.1101/2021.12.15.472775v1.full.pdf).
 
+The training of CellOT on 4i data takes around 3 hours on CPU. Once trained, the model can be evaluated via:
+```
+python ./scripts/evaluate.py --outdir ./results/4i/drug-cisplatin/model-cellot --setting iid --where data_space
+```
+The user can hereby choose if the model is evaluated in the `iid` or `ood` setting, and if the metrics are considered in the data or latent space (via the flag `where`). Please note that for 4i data, no o.o.s. or o.o.d. task exists and no embedding is necessary (i.e., evaluation in `data_space`).
+
 ## Citation
 
 In case you found our work useful, please consider citing us:
