@@ -1,6 +1,6 @@
 # [Learning Single-Cell Perturbation Responses using Neural Optimal Transport](https://www.biorxiv.org/content/10.1101/2021.12.15.472775v1.full.pdf)
 
-**Authors**: Charlotte Bunne\*, Stefan G. Stark\*, Gabriele Gut\*, Jacobo Sarabia Del Castillo, Kjong-Van Lehmann, Lucas Pelkmans, Andreas Krause, Gunnar Rätsch
+**Authors**: Charlotte Bunne\*, Stefan G. Stark\*, Gabriele Gut\*, Jacobo Sarabia Del Castillo, Mitch Levesque, Kjong-Van Lehmann, Lucas Pelkmans, Andreas Krause, Gunnar Rätsch
 
 The preprint is available [**here**](https://www.biorxiv.org/content/10.1101/2021.12.15.472775v1.full.pdf).
 
@@ -27,7 +27,7 @@ In case you found our work useful, please consider citing us:
 ```
 @article{bunne2021learning,
   title={{Learning Single-Cell Perturbation Responses using Neural Optimal Transport}},
-  author={Bunne, Charlotte and Stark, Stefan G and Gut, Gabriele and del Castillo, Jacobo Sarabia and Lehmann, Kjong-Van and Pelkmans, Lucas and Krause, Andreas and Ratsch, Gunnar},
+  author={Bunne, Charlotte and Stark, Stefan G and Gut, Gabriele and del Castillo, Jacobo Sarabia, and Levesque, Mitch and Lehmann, Kjong-Van and Pelkmans, Lucas and Krause, Andreas and Ratsch, Gunnar},
   journal={bioRxiv},
   year={2021},
   publisher={Cold Spring Harbor Laboratory}
