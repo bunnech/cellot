@@ -28,10 +28,17 @@ To install `CellOT` run:
 ```
 python setup.py develop
 ```
-Package requirements and dependencies are listed in `requirements.txt`.
+Package requirements and dependencies are listed in `requirements.txt`. Installation time: < 5 minutes.
 
 ## Datasets
 You can download the preprocessed data [here](https://polybox.ethz.ch/index.php/s/RAykIMfDl0qCJaM).
+
+## Experiments
+After downloading the dataset, the CellOT model can be trained via the `scripts/train.py` script. For example, we can train CellOT on 4i data to predict perturbation effects on Cisplatin:
+```
+python ./scripts/train.py --outdir ./results/4i/drug-cisplatin/model-cellot --config ./configs/tasks/4i.yaml --config ./configs/models/cellot.yaml --config.data.target cisplatin
+```
+All scripts to reproduce the experiments in the i.i.d. (independent-and-identically-distributed), o.o.s. (out-of-sample), and o.o.d. (out-of-distribution) setting can be found in `scripts/submit`. More details on the methods and experiments can be found in the [preprint](https://www.biorxiv.org/content/10.1101/2021.12.15.472775v1.full.pdf).
 
 ## Citation
 
