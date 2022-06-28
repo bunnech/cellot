@@ -1,0 +1,45 @@
+# mac
+.DS_Store
+
+# environments
+.env
+.envrc
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# jupyter notebook
+.ipynb_checkpoints
+
+# packaging
+.Python
+.idea/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# byte-compiled
+__pycache__/
+*.py[cod]
+*$py.class
+
+# other
+.vscode
