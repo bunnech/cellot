@@ -14,8 +14,8 @@ This repository contains the `CellOT` method and evaluation scripts to reproduce
 
 To setup the corresponding `conda` environment run:
 ```
-conda create --name cell python=3.9.5
-conda activate cell
+conda create --name cellot python=3.9.5
+conda activate cellot
 
 conda update -n base -c defaults conda
 pip install --upgrade pip
