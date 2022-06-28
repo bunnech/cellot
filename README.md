@@ -12,6 +12,10 @@ This repository contains the `CellOT` method and evaluation scripts to reproduce
 
 ## Installation
 
+To setup the corresponding `conda` environment and install all dependencies run:
+```
+sh install_dependencies.sh
+```
 To install `CellOT` run:
 ```
 python setup.py develop
