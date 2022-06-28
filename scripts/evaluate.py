@@ -19,20 +19,14 @@ flags.DEFINE_string("outdir", "", "Path to outdir.")
 flags.DEFINE_integer("n_markers", None, "Number of marker genes.")
 flags.DEFINE_string("subset", None, "Name of obs entry to use as subset.")
 flags.DEFINE_string("subset_name", None, "Name of subset.")
-
 flags.DEFINE_enum(
-    "setting", "iid", ["iid", "ood"], "Evaluate iid, ood or via combinations."
+    "setting", "iid", ["iid", "ood"], "Evaluate iid or ood setting."
 )
-
 flags.DEFINE_enum(
-    "where",
-    "data_space",
-    ["data_space", "latent_space"],
-    "In which space to conduct analysis",
+    "where", "data_space", ["data_space", "latent_space"],
+    "In which space to conduct analysis.",
 )
-
 flags.DEFINE_multi_string("via", "", "Directory containing compositional map.")
-
 flags.DEFINE_string("subname", "", "")
 
 

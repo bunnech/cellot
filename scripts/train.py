@@ -1,9 +1,7 @@
 import sys
 from collections import namedtuple
-
 import yaml
-from absl import flags
-
+from absl import app, flags
 import cellot.train
 from cellot.train.experiment import prepare
 from cellot.utils.helpers import symlink_to_logfile, write_metadata
@@ -14,19 +12,17 @@ Pair = namedtuple("Pair", "source target")
 FLAGS = flags.FLAGS
 
 flags.DEFINE_multi_string("config", "", "Path to config")
-
 flags.DEFINE_string("exp_group", "cellot_exps", "Name of experiment.")
-
 flags.DEFINE_string("online", "offline", "Run experiment online or offline.")
-
-flags.DEFINE_boolean("restart", False, "delete cache")
-flags.DEFINE_boolean("debug", False, "debug mode")
-flags.DEFINE_boolean("dry", False, "dry mode")
-flags.DEFINE_boolean("verbose", False, "run in verbose mode")
+flags.DEFINE_boolean("restart", False, "Delete cache.")
+flags.DEFINE_boolean("debug", False, "Debug mode.")
+flags.DEFINE_boolean("dry", False, "Dry mode.")
+flags.DEFINE_boolean("verbose", False, "Run in verbose mode.")
 
 
 def main(argv):
     config, outdir = prepare(argv)
+
     if FLAGS.dry:
         print(outdir)
         print(config)
@@ -82,4 +78,7 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    if '--help' in sys.argv:
+        app.run(main)
+    else:
+        main(sys.argv)
