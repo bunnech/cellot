@@ -38,7 +38,7 @@ After downloading the dataset, the CellOT model can be trained via the `scripts/
 ```
 python ./scripts/train.py --outdir ./results/4i/drug-cisplatin/model-cellot --config ./configs/tasks/4i.yaml --config ./configs/models/cellot.yaml --config.data.target cisplatin
 ```
-All scripts to reproduce the experiments in the i.i.d. (independent-and-identically-distributed), o.o.s. (out-of-sample), and o.o.d. (out-of-distribution) setting can be found in `scripts/submit`. More details on the methods and experiments can be found in the [preprint](https://www.biorxiv.org/content/10.1101/2021.12.15.472775v1.full.pdf).
+All scripts to reproduce the experiments in the i.i.d. (independent-and-identically-distributed), o.o.s. (out-of-sample), and o.o.d. (out-of-distribution) setting can be found in `scripts/submit`. More details on the method and experiments can be found in the [preprint](https://www.biorxiv.org/content/10.1101/2021.12.15.472775v1.full.pdf).
 
 ## Citation
 
