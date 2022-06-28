@@ -34,7 +34,7 @@ Package requirements and dependencies are listed in `requirements.txt`. Installa
 You can download the preprocessed data [here](https://polybox.ethz.ch/index.php/s/RAykIMfDl0qCJaM).
 
 ## Experiments
-After downloading the dataset, the CellOT model can be trained via the `scripts/train.py` script. For example, we can train CellOT on 4i data to predict perturbation effects on Cisplatin:
+After downloading the dataset, the CellOT model can be trained via the `scripts/train.py` script. For example, we can train CellOT on 4i data to predict perturbation effects of Cisplatin:
 ```
 python ./scripts/train.py --outdir ./results/4i/drug-cisplatin/model-cellot --config ./configs/tasks/4i.yaml --config ./configs/models/cellot.yaml --config.data.target cisplatin
 ```
