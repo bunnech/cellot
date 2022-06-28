@@ -24,3 +24,4 @@ sphinx==4.2.0
 sphinx-press-theme==0.8.0
 torchvision==0.8.2
 torch==1.7.1
+geomloss==0.2.5
