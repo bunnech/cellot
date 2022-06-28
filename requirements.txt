@@ -13,4 +13,4 @@ scikit-learn==1.1.1
 seaborn==0.11.1
 sphinx==4.2.0
 sphinx-press-theme==0.8.0
-torch==1.7.1
+torch==1.11.0
