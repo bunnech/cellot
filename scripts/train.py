@@ -6,8 +6,7 @@ from absl import flags
 
 import cellot.train
 from cellot.train.experiment import prepare
-from cellot.utils.helpers import symlink_to_logfile, write_metadata, flat_dict
-import wandb
+from cellot.utils.helpers import symlink_to_logfile, write_metadata
 
 
 Pair = namedtuple("Pair", "source target")
@@ -49,18 +48,6 @@ def main(argv):
     if FLAGS.restart:
         (cachedir / "model.pt").unlink(missing_ok=True)
         (cachedir / "scalars").unlink(missing_ok=True)
-
-    wandb_config = flat_dict(config.to_dict())
-
-    # init wandb
-    wandb.init(
-        project="exp_single",
-        dir=cachedir,
-        group=FLAGS.exp_group,
-        entity="teamcot",
-        config=wandb_config,
-        mode=FLAGS.online,
-    )
 
     if config.model.name == "cellot":
         train = cellot.train.train_cellot

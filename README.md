@@ -12,9 +12,22 @@ This repository contains the `CellOT` method and evaluation scripts to reproduce
 
 ## Installation
 
-To setup the corresponding `conda` environment and install all dependencies run:
+To setup the corresponding `conda` environment run:
 ```
-sh install_dependencies.sh
+conda create --name cell python=3.9.5
+conda activate cell
+
+conda update -n base -c defaults conda
+pip install --upgrade pip
+```
+Activate the `conda` environment by calling
+```
+conda activate cellot
+```
+and install requirements and dependencies via:
+```
+pip install -r requirements.txt
+python setup.py develop
 ```
 To install `CellOT` run:
 ```

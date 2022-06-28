@@ -137,19 +137,6 @@ def write_metadata(outpath, argv):
     return
 
 
-def config_from_wandb(path):
-    config = yaml.load(open(path), yaml.UnsafeLoader)
-    del config["wandb_version"]
-    del config["_wandb"]
-    for key, val in config.items():
-        val = val["value"]
-        config[key].pop("desc", None)
-        config[key].pop("value", None)
-        config[key] = val
-
-    return ConfigDict(nest_dict(config))
-
-
 def parse_config_cli(path, args):
     if isinstance(path, list):
         config = ConfigDict()

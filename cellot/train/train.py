@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import torch
-import wandb
 import numpy as np
 from absl import logging
 from cellot import losses
@@ -78,17 +77,6 @@ def train_cellot(outdir, config):
             mmd=mmd,
             step=step,
         )
-        # log to wandb
-        wandb.log(
-            {
-                "valid_loss_f": fl.item(),
-                "valid_loss_g": gl.item(),
-                "valid_w_dist": dist.item(),
-                "valid_pred_acc_w": wst,
-                "valid_pred_acc_mmd": mmd,
-                "step": step,
-            }
-        )
         check_loss(gl, gl, dist)
 
         return mmd
@@ -132,10 +120,6 @@ def train_cellot(outdir, config):
         if step % config.training.logs_freq == 0:
             # log to logger object
             logger.log("train", gloss=gl.item(), floss=fl.item(), step=step)
-            # log to wandb
-            wandb.log(
-                {"train_loss_f": fl.item(), "train_loss_g": gl.item(), "step": step}
-            )
 
         if step % config.training.eval_freq == 0:
             mmd = evaluate()
@@ -179,9 +163,7 @@ def train_auto_encoder(outdir, config):
             comps = {k: v.mean().item() for k, v in comps._asdict().items()}
             check_loss(loss)
             logger.log("eval", loss=loss.item(), step=step, **comps)
-            wandb.log(
-                {"valid_loss": loss.item(), "valid_mse": comps["mse"], "step": step}
-            )
+
         return loss
 
     logger = Logger(outdir / "cache/scalars")
@@ -217,11 +199,6 @@ def train_auto_encoder(outdir, config):
         if step % config.training.logs_freq == 0:
             # log to logger object
             logger.log("train", loss=loss.item(), step=step, **comps)
-
-            # log to wandb
-            wandb.log(
-                {"train_loss": loss.item(), "train_mse": comps["mse"], "step": step}
-            )
 
         if step % config.training.eval_freq == 0:
             model.eval()

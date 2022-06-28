@@ -1,22 +1,13 @@
 setuptools==49.6.0
 numpy==1.19.5
-flax==0.3.4
 matplotlib==3.3.3
-jax==0.2.18
-jaxlib>=0.1.0
 scanpy==1.8.1
 jupyterlab==3.0.16
 ipython==7.18.1
 anndata==0.7.6
-ott-jax==0.1.13
-wandb==0.12.0
 ml-collections==0.1.0
-tensorflow_datasets==4.3.0
-tensorflow==2.5.0
 matplotlib==3.3.3
-optax==0.0.9
 pandas==1.2.5
-pot==0.7.0
 scikit-learn==0.24.2
 scipy==1.6.2
 seaborn==0.11.1
@@ -24,4 +15,3 @@ sphinx==4.2.0
 sphinx-press-theme==0.8.0
 torchvision==0.8.2
 torch==1.7.1
-geomloss==0.2.5
