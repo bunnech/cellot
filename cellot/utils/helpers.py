@@ -4,7 +4,6 @@ from ml_collections import ConfigDict
 from pathlib import Path
 import os
 import re
-import git
 import json
 from time import localtime, strftime
 
@@ -124,13 +123,11 @@ def parse_cli_opts(args):
 
 def write_metadata(outpath, argv):
     program, *args = argv
-    repo = git.Repo(search_parent_directories=True)
     now = strftime("%Y-%m-%d %H:%M:%S", localtime())
     lut = {
         "startedAt": now,
         "args": args,
         "program": program,
-        "git": {"remote": repo.remotes.origin.url, "commit": repo.head.object.hexsha},
     }
 
     json.dump(lut, open(outpath, "w"), indent=2)
