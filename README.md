@@ -28,10 +28,23 @@ To install `CellOT` run:
 ```
 python setup.py develop
 ```
-Package requirements and dependencies are listed in `requirements.txt`.
+Package requirements and dependencies are listed in `requirements.txt`. Installation takes < 5 minutes and has been tested on Linux (CentOS Linux release 7.9.2009), macOS (Version 12.4, with Apple M1 Pro and Version 11.3, with 2.6 GHz Intel Core i7). 
 
 ## Datasets
 You can download the preprocessed data [here](https://polybox.ethz.ch/index.php/s/RAykIMfDl0qCJaM).
+
+## Experiments
+After downloading the dataset, the CellOT model can be trained via the `scripts/train.py` script. For example, we can train CellOT on 4i data to predict perturbation effects of Cisplatin:
+```
+python ./scripts/train.py --outdir ./results/4i/drug-cisplatin/model-cellot --config ./configs/tasks/4i.yaml --config ./configs/models/cellot.yaml --config.data.target cisplatin
+```
+All scripts to reproduce the experiments in the i.i.d. (independent-and-identically-distributed), o.o.s. (out-of-sample), and o.o.d. (out-of-distribution) setting can be found in `scripts/submit`. More details on the method and experiments can be found in the [preprint](https://www.biorxiv.org/content/10.1101/2021.12.15.472775v1.full.pdf).
+
+The training of CellOT on 4i data takes around 3 hours on CPU. Once trained, the model can be evaluated via:
+```
+python ./scripts/evaluate.py --outdir ./results/4i/drug-cisplatin/model-cellot --setting iid --where data_space
+```
+The user can hereby choose if the model is evaluated in the `iid` or `ood` setting, and if the metrics are considered in the data or latent space (via the flag `where`). Please note that for 4i data, no o.o.s. or o.o.d. task exists and no embedding is necessary (i.e., evaluation in `data_space`).
 
 ## Citation
 
