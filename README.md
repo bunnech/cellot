@@ -35,4 +35,4 @@ In case you found our work useful, please consider citing us:
 ```
 
 ## Contact
-In case you have questions, please contact [Stefan G. Stark](starks@ethz.ch) and [Charlotte Bunne](bunnec@ethz.ch).
+In case you have questions, please contact [Stefan G. Stark](mailto:starks@ethz.ch) and [Charlotte Bunne](mailto:bunnec@ethz.ch).
