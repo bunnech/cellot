@@ -28,7 +28,7 @@ To install `CellOT` run:
 ```
 python setup.py develop
 ```
-Package requirements and dependencies are listed in `requirements.txt`. Installation takes < 5 minutes and has been tested on Linux (CentOS Linux release 7.9.2009), macOS (Version 12.4, with Apple M1 Pro and Version 10.14, with 2.6 GHz Intel Core i7). 
+Package requirements and dependencies are listed in `requirements.txt`. Installation takes < 5 minutes and has been tested on Linux (CentOS Linux release 7.9.2009), macOS (Version 12.4, with Apple M1 Pro and Version 11.3, with 2.6 GHz Intel Core i7). 
 
 ## Datasets
 You can download the preprocessed data [here](https://polybox.ethz.ch/index.php/s/RAykIMfDl0qCJaM).
