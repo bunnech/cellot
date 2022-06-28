@@ -1,0 +1,21 @@
+model:
+   name: scgen
+   beta: 0.0
+   dropout: 0.0
+   hidden_units: [512, 512]
+   latent_dim: 50
+
+optim:
+   lr: 0.001
+   optimizer: Adam
+   weight_decay: 1.0e-05
+
+scheduler:
+   gamma: 0.5
+   step_size: 100000
+
+training:
+  cache_freq: 10000
+  eval_freq: 2500
+  logs_freq: 250
+  n_iters: 250000

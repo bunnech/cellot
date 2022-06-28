@@ -1,0 +1,15 @@
+data:
+  features: ./datasets/4i/features.txt
+  path: ./datasets/4i/8h.h5ad
+  condition: drug
+  source: control
+  type: cell
+
+dataloader:
+  batch_size: 256
+  shuffle: true
+
+datasplit:
+  groupby: drug
+  name: train_test
+  test_size: 0.2

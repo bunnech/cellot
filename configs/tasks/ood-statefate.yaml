@@ -1,0 +1,19 @@
+data:
+  type: cell
+  source: control
+  target: developed
+  condition: condition 
+  path: datasets/scrna-statefate/in_vitro/hvg.h5ad
+
+datasplit:
+  holdout: Lin-Kit+Sca1-
+  key: population 
+  groupby: condition
+  name: toggle_ood
+  mode: ood
+  test_size: 0.2
+  random_state: 0
+
+dataloader:
+    batch_size: 256
+    shuffle: true

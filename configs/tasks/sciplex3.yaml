@@ -1,0 +1,16 @@
+data:
+  type: cell
+  source: control
+  condition: drug
+  path: datasets/scrna-sciplex3/hvg-top1k.h5ad
+
+datasplit:
+    groupby: drug 
+    name: train_test
+    test_size: 0.2
+    random_state: 0
+
+dataloader:
+    batch_size: 256
+    shuffle: true
+
