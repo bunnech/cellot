@@ -122,8 +122,7 @@ def read_merged_anndata(config, pathlist=None):
 
             yield data.uns['sample'], data
 
-    assert (config.data.type == 'cell-merged') \
-        or (config.data.type == 'tupro-cohort')
+    assert (config.data.type == 'cell-merged')
 
     if pathlist is None:
         pathlist = read_list(config.data.paths)
@@ -158,9 +157,6 @@ def load_cell_data(
 
         elif config.data.type == 'cell-merged':
             data = read_merged_anndata(config, **kwargs)
-
-        elif config.data.type == 'tupro-cohort':
-            data = read_tupro_cohort(config, **kwargs)
 
     if config.data.get('select') is not None:
         keep = pd.Series(False, index=data.obs_names)
