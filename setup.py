@@ -10,6 +10,7 @@ setup(name='cellot',
       author_email='bunnec@ethz.ch, starks@ethz.ch',
       license='BSD',
       install_requires=[],
+      py_modules=['cellot'],
       long_description=open('READme.md').read(),
       zip_safe=False,
 )
