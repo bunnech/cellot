@@ -1,7 +1,6 @@
 # !/usr/bin/python3
 
-from setuptools import setup, find_packages
-import os
+from setuptools import setup
 
 setup(name='cellot',
       version='0.1',
@@ -12,6 +11,6 @@ setup(name='cellot',
       packages=['cellot'],
       license='BSD',
       install_requires=[],
-      long_description=open('README.txt').read(),
+      long_description=open('READme.md').read(),
       zip_safe=False,
 )
