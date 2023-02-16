@@ -1,0 +1,19 @@
+data:
+  type: cell
+  source: ctrl
+  target: stim
+  condition: condition
+  path: datasets/scrna-lupuspatients/kang_new.h5ad
+
+datasplit:
+  # holdout:
+  #   sample_id: 101
+  groupby: condition
+  name: train_test
+  test_size: 0.2
+  random_state: 0
+
+dataloader:
+  batch_size: 64
+  shuffle: true
+

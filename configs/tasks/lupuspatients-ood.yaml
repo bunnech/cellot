@@ -3,7 +3,7 @@ data:
   source: ctrl
   target: stim
   condition: condition
-  path: datasets/scrna-lupuspatients/kang-hvg.h5ad
+  path: datasets/scrna-lupuspatients/kang_new.h5ad
 
 dataloader:
   batch_size: 64

@@ -1,6 +1,6 @@
 data:
-  features: ./datasets/4i/features.txt
-  path: ./datasets/4i/8h.h5ad
+  features: ./datasets/cl-8h/features.txt
+  path: ./datasets/cl-8h/4i-melanoma_cell_lines-8h.h5ad
   condition: drug
   source: control
   type: cell

@@ -5,12 +5,14 @@ data:
   path: datasets/scrna-sciplex3/hvg-top1k-train-only.h5ad
 
 dataloader:
-  batch_size: 256
-  shuffle: true
+    batch_size: 256
+    shuffle: true
 
 datasplit:
-  groupby: drug 
-  name: train_test_eval
-  test_size: 1000
-  eval_size: 1000
+  holdout: K562
+  key: cell_type
+  groupby: ['cell_type', 'drug'] 
+  name: toggle_ood
+  mode: ood
+  test_size: 500
   random_state: 0

@@ -3,7 +3,7 @@ data:
   source: control
   target: developed
   condition: condition 
-  path: datasets/scrna-statefate/invitro-hvg.h5ad
+  path: datasets/scrna-statefate/in_vitro/hvg.h5ad
 
 datasplit:
   holdout: Lin-Kit+Sca1-

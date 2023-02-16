@@ -4,6 +4,7 @@ from ml_collections import ConfigDict
 from pathlib import Path
 import os
 import re
+import git
 import json
 from time import localtime, strftime
 
@@ -123,15 +124,30 @@ def parse_cli_opts(args):
 
 def write_metadata(outpath, argv):
     program, *args = argv
+    repo = git.Repo(search_parent_directories=True)
     now = strftime("%Y-%m-%d %H:%M:%S", localtime())
     lut = {
         "startedAt": now,
         "args": args,
         "program": program,
+        "git": {"remote": repo.remotes.origin.url, "commit": repo.head.object.hexsha},
     }
 
     json.dump(lut, open(outpath, "w"), indent=2)
     return
+
+
+def config_from_wandb(path):
+    config = yaml.load(open(path), yaml.UnsafeLoader)
+    del config["wandb_version"]
+    del config["_wandb"]
+    for key, val in config.items():
+        val = val["value"]
+        config[key].pop("desc", None)
+        config[key].pop("value", None)
+        config[key] = val
+
+    return ConfigDict(nest_dict(config))
 
 
 def parse_config_cli(path, args):
@@ -146,3 +162,27 @@ def parse_config_cli(path, args):
     config.update(opts)
 
     return config
+
+
+def compile_extraction_from_path(*keys):
+    regex = {
+        key: re.compile(rf'{key}-(\w+)/')
+        for key
+        in keys
+    }
+
+    def extract(path):
+        path = str(path)
+
+        def iterate():
+            for k, r in regex.items():
+                try:
+                    v, *_ = r.findall(path)
+                except ValueError:
+                    v = None
+
+                yield k, v
+
+        return dict(iterate())
+
+    return extract

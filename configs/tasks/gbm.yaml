@@ -1,0 +1,19 @@
+data:
+  type: cell
+  source: control
+  target: panobinostat
+  condition: perturbation
+  path: datasets/scrna-gbm/hvg-top1k-train-only.h5ad
+
+dataloader:
+  batch_size: 256
+  shuffle: true
+
+datasplit:
+  groupby: perturbation 
+  name: train_test_eval
+  test_size: 500
+  eval_size: 500
+  random_state: 0
+  subset:
+    sample: PW040

@@ -3,31 +3,107 @@ import numpy as np
 import pandas as pd
 from absl import app, flags
 from cellot.utils.evaluate import (
-    compute_drug_signature_differences,
-    compute_knn_enrichment,
-    compute_mmd_df,
     load_conditions,
+    compute_knn_enrichment,
 )
+from cellot.losses.mmd import mmd_distance
 from cellot.utils import load_config
-from umap import UMAP
 from cellot.data.cell import read_single_anndata
+import jax.numpy as jnp
+from ott.core import sinkhorn
+from ott.geometry import pointcloud
 
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean("predictions", True, "Run predictions.")
-flags.DEFINE_string("outdir", "", "Path to outdir.")
-flags.DEFINE_integer("n_markers", None, "Number of marker genes.")
-flags.DEFINE_string("subset", None, "Name of obs entry to use as subset.")
-flags.DEFINE_string("subset_name", None, "Name of subset.")
+flags.DEFINE_boolean('predictions', True, 'Run predictions.')
+flags.DEFINE_boolean('debug', False, 'run in debug mode')
+flags.DEFINE_string('outdir', '', 'Path to outdir.')
+flags.DEFINE_string('n_markers', None, 'comma seperated list of integers')
+flags.DEFINE_string(
+        'n_cells', '100,250,500,1000,1500',
+        'comma seperated list of integers')
+
+flags.DEFINE_integer('n_reps', 10, 'number of evaluation repetitions')
+flags.DEFINE_string('subset', None, 'Name of obs entry to use as subset.')
+flags.DEFINE_string('subset_name', None, 'Name of subset.')
+flags.DEFINE_string('embedding', None, 'specify embedding context')
+flags.DEFINE_string('evalprefix', None, 'override default prefix')
+
 flags.DEFINE_enum(
-    "setting", "iid", ["iid", "ood"], "Evaluate iid or ood setting."
+    'setting', 'iid', ['iid', 'ood'], 'Evaluate iid, ood or via combinations.'
 )
+
 flags.DEFINE_enum(
-    "where", "data_space", ["data_space", "latent_space"],
-    "In which space to conduct analysis.",
+    'where',
+    'data_space',
+    ['data_space', 'latent_space'],
+    'In which space to conduct analysis',
 )
-flags.DEFINE_multi_string("via", "", "Directory containing compositional map.")
-flags.DEFINE_string("subname", "", "")
+
+flags.DEFINE_multi_string('via', '', 'Directory containing compositional map.')
+
+flags.DEFINE_string('subname', '', '')
+
+
+def compute_mmd_loss(lhs, rhs, gammas):
+    return np.mean([mmd_distance(lhs, rhs, g) for g in gammas])
+
+
+def compute_wasserstein_loss(x, y, epsilon=0.1):
+    """Computes transport between x and y via Sinkhorn algorithm."""
+    a = jnp.ones(len(x)) / len(x)
+    b = jnp.ones(len(y)) / len(y)
+
+    # compute cost
+    geom_xy = pointcloud.PointCloud(x, y, epsilon=epsilon)
+
+    # solve ot problem
+    out_xy = sinkhorn.sinkhorn(geom_xy, a, b, max_iterations=100, min_iterations=10)
+
+    # return regularized ot cost
+    return out_xy.reg_ot_cost.item()
+
+
+def compute_pairwise_corrs(df):
+    corr = df.corr().rename_axis(index='lhs', columns='rhs')
+    return (
+        corr
+        .where(np.triu(np.ones(corr.shape), k=1).astype(bool))
+        .stack()
+        .reset_index()
+        .set_index(['lhs', 'rhs'])
+        .squeeze()
+        .rename()
+    )
+
+
+def compute_evaluations(iterator):
+    gammas = np.logspace(1, -3, num=50)
+    for ncells, nfeatures, treated, imputed in iterator:
+        mut, mui = treated.mean(0), imputed.mean(0)
+        stdt, stdi = treated.std(0), imputed.std(0)
+        pwct = compute_pairwise_corrs(treated)
+        pwci = compute_pairwise_corrs(imputed)
+
+        yield ncells, nfeatures, 'l2-means', np.linalg.norm(mut - mui)
+        yield ncells, nfeatures, 'l2-stds', np.linalg.norm(stdt - stdi)
+        yield ncells, nfeatures, 'r2-means', pd.Series.corr(mut, mui)
+        yield ncells, nfeatures, 'r2-stds', pd.Series.corr(stdt, stdi)
+        yield ncells, nfeatures, 'r2-pairwise_feat_corrs', pd.Series.corr(pwct, pwci)
+        yield ncells, nfeatures, 'l2-pairwise_feat_corrs', np.linalg.norm(pwct - pwci)
+
+        if treated.shape[1] < 1000:
+            mmd = compute_mmd_loss(treated, imputed, gammas=gammas)
+            w2 = compute_wasserstein_loss(treated.values, imputed.values)
+            yield ncells, nfeatures, 'mmd', mmd
+            yield ncells, nfeatures, 'w2', w2
+
+            knn, enrichment = compute_knn_enrichment(imputed, treated)
+            k50 = enrichment.iloc[:, :50].values.mean()
+            k100 = enrichment.iloc[:, :100].values.mean()
+
+            yield ncells, nfeatures, 'enrichment-k50', k50
+            yield ncells, nfeatures, 'enrichment-k100', k100
 
 
 def main(argv):
@@ -36,83 +112,104 @@ def main(argv):
     where = FLAGS.where
     subset = FLAGS.subset
     subset_name = FLAGS.subset_name
+    embedding = FLAGS.embedding
+    prefix = FLAGS.evalprefix
+    n_reps = FLAGS.n_reps
 
-    if subset is None:
-        outdir = expdir / f"evals_{setting}_{where}"
+    if (embedding is None) or len(embedding) == 0:
+        embedding = None
+
+    if FLAGS.n_markers is None:
+        n_markers = None
     else:
-        assert subset is not None
-        outdir = expdir / f"evals_{setting}_{where}_{subset}_{subset_name}"
+        n_markers = FLAGS.n_markers.split(',')
+    all_ncells = [int(x) for x in FLAGS.n_cells.split(',')]
 
-    if len(FLAGS.subname) > 0:
-        outdir = outdir / FLAGS.subname
+    if prefix is None:
+        if subset is None:
+            prefix = f'stability_check-evals_{setting}_{where}'
+        else:
+            assert subset is not None
+            prefix = f'stability_check-evals_{setting}_{where}_{subset}_{subset_name}'
+
+        if len(FLAGS.subname) > 0:
+            prefix = prefix + '/' + FLAGS.subname
+
+    outdir = expdir / prefix
 
     outdir.mkdir(exist_ok=True, parents=True)
 
-    config = load_config(expdir / "config.yaml")
-    if "ae_emb" in config.data:
-        assert config.model.name == "cellot"
-        config.data.ae_emb.path = str(expdir.parent / "model-scgen")
-    cache = outdir / "imputed.h5ad"
+    def iterate_feature_slices():
 
-    control, treated, imputed = load_conditions(expdir, where, setting)
-    imputed.write(cache)
-    imputed = imputed.to_df()
+        config = load_config(expdir / 'config.yaml')
+        if 'ae_emb' in config.data:
+            assert config.model.name == 'cellot'
+            config.data.ae_emb.path = str(expdir.parent / 'model-scgen')
+        cache = outdir / 'imputed.h5ad'
 
-    if FLAGS.n_markers is not None:
-        data = read_single_anndata(config, path=None)
-        sel_mg = (
-            data.varm[f"marker_genes-{config.data.condition}-rank"][config.data.target]
-            .sort_values()
-            .index[: FLAGS.n_markers]
-        )
+        _, treateddf, imputed = load_conditions(
+                expdir, where, setting, embedding=embedding)
 
-        control = control[sel_mg]
-        treated = treated[sel_mg]
-        imputed = imputed[sel_mg]
+        imputed.write(cache)
+        imputeddf = imputed.to_df()
 
-    if FLAGS.subset is not None:
-        data = read_single_anndata(config, path=None)
+        imputeddf.columns = imputeddf.columns.astype(str)
+        treateddf.columns = treateddf.columns.astype(str)
 
-        if subset != "time":
-            control = control[data.obs[subset] == subset_name]
-            imputed = imputed[data.obs[subset] == subset_name]
-            treated = treated[data.obs[subset] == subset_name]
+        assert imputeddf.columns.equals(treateddf.columns)
+
+        def load_markers():
+            data = read_single_anndata(config, path=None)
+            key = f'marker_genes-{config.data.condition}-rank'
+
+            # rebuttal preprocessing stored marker genes using
+            # a generic marker_genes-condition-rank key
+            # instead of e.g. marker_genes-drug-rank
+            # let's just patch that here:
+            if key not in data.varm:
+                key = 'marker_genes-condition-rank'
+                print('WARNING: using generic condition marker genes')
+
+            sel_mg = (
+                data.varm[key][config.data.target]
+                .sort_values()
+                .index
+            )
+            return sel_mg
+
+        if n_markers is not None:
+            markers = load_markers()
+            for k in n_markers:
+                if k != 'all':
+                    feats = markers[:int(k)]
+                else:
+                    feats = list(markers)
+
+                for ncells in all_ncells:
+                    if ncells > min(len(treateddf), len(imputeddf)):
+                        break
+                    for r in range(n_reps):
+                        trt = treateddf[feats].sample(ncells)
+                        imp = imputeddf[feats].sample(ncells)
+                        yield ncells, k, trt, imp
+
         else:
-            treated = treated[data.obs[subset] == int(subset_name)]
+            for ncells in all_ncells:
+                if ncells > min(len(treateddf), len(imputeddf)):
+                    break
+                for r in range(n_reps):
+                    trt = treateddf.sample(ncells)
+                    imp = imputeddf.sample(ncells)
+                    yield ncells, 'all', trt, imp
 
-    imputed.columns = imputed.columns.astype(str)
-    treated.columns = treated.columns.astype(str)
-    control.columns = control.columns.astype(str)
-
-    assert imputed.columns.equals(treated.columns)
-
-    l2ds = compute_drug_signature_differences(control, treated, imputed)
-    knn, enrichment, joint = compute_knn_enrichment(imputed, treated, return_joint=True)
-    mmddf = compute_mmd_df(imputed, treated, subsample=True, ncells=5000)
-
-    l2ds.to_csv(outdir / "drug_signature_diff.csv")
-    enrichment.to_csv(outdir / "knn_enrichment.csv")
-    knn.to_csv(outdir / "knn_neighbors.csv")
-    mmddf.to_csv(outdir / "mmd.csv")
-
-    summary = pd.Series(
-        {
-            "l2DS": np.sqrt((l2ds**2).sum()),
-            "enrichment-k50": enrichment.iloc[:, :50].values.mean(),
-            "enrichment-k100": enrichment.iloc[:, :100].values.mean(),
-            "mmd": mmddf["mmd"].mean(),
-        }
-    )
-    summary.to_csv(outdir / "evals.csv", header=None)
-
-    umap = pd.DataFrame(
-        UMAP().fit_transform(joint), index=joint.index, columns=["UMAP1", "UMAP2"]
-    )
-    umap["is_imputed"] = umap.index.isin(imputed.index)
-    umap.to_csv(outdir / "umap.csv")
+    evals = pd.DataFrame(
+            compute_evaluations(iterate_feature_slices()),
+            columns=['ncells', 'nfeatures', 'metric', 'value']
+            )
+    evals.to_csv(outdir / 'evals.csv', index=None)
 
     return
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(main)
