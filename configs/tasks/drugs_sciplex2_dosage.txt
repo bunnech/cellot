@@ -1,5 +1,0 @@
-
-BMS_1.0
-Dex_1.0
-Nutlin_1.0
-SAHA_1.0
