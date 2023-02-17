@@ -2,7 +2,6 @@ from pathlib import Path
 
 import torch
 import numpy as np
-import wandb
 import random
 import pickle
 from absl import logging
@@ -10,9 +9,6 @@ from absl.flags import FLAGS
 from cellot import losses
 from cellot.utils.loaders import load
 from cellot.models.cellot import compute_loss_f, compute_loss_g, compute_w2_distance
-from cellot.models.popalign import onmf, choose_featureset, build_gmm
-from cellot.models.popalign import align_components, get_perturbation_response
-from cellot.models.popalign import transport_popalign
 from cellot.train.summary import Logger
 from cellot.data.utils import cast_loader_to_iterator
 from cellot.models.ae import compute_scgen_shift
@@ -71,9 +67,6 @@ def train_cellot(outdir, config):
             mmd = losses.compute_scalar_mmd(
                 target.detach().numpy(), transport.detach().numpy()
             )
-            wst = losses.wasserstein_loss(
-                target.detach().numpy(), transport.detach().numpy()
-            )
 
         # log to logger object
         logger.log(
@@ -83,17 +76,6 @@ def train_cellot(outdir, config):
             jloss=dist.item(),
             mmd=mmd,
             step=step,
-        )
-        # log to wandb
-        wandb.log(
-            {
-                "valid_loss_f": fl.item(),
-                "valid_loss_g": gl.item(),
-                "valid_w_dist": dist.item(),
-                "valid_pred_acc_w": wst,
-                "valid_pred_acc_mmd": mmd,
-                "step": step,
-            }
         )
         check_loss(gl, gl, dist)
 
@@ -206,17 +188,11 @@ def train_auto_encoder(outdir, config):
             comps = {k: v.mean().item() for k, v in comps._asdict().items()}
             check_loss(loss)
             logger.log("eval", loss=loss.item(), step=step, **comps)
-            wandb.log(
-                {"valid_loss": loss.item(), "valid_mse": comps["mse"], "step": step}
-            )
         return loss
 
     logger = Logger(outdir / "cache/scalars")
     cachedir = outdir / "cache"
     model, optim, loader = load(config, restore=cachedir / "last.pt")
-    if FLAGS.debug:
-        import ipdb
-        ipdb.set_trace()
 
     iterator = cast_loader_to_iterator(loader, cycle_all=True)
     scheduler = load_lr_scheduler(optim, config)
@@ -248,11 +224,6 @@ def train_auto_encoder(outdir, config):
         if step % config.training.logs_freq == 0:
             # log to logger object
             logger.log("train", loss=loss.item(), step=step, **comps)
-
-            # log to wandb
-            wandb.log(
-                {"train_loss": loss.item(), "train_mse": comps["mse"], "step": step}
-            )
 
         if step % config.training.eval_freq == 0:
             model.eval()

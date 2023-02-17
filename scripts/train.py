@@ -4,7 +4,6 @@ import yaml
 from absl import app, flags
 import cellot.train
 from cellot.train.experiment import prepare
-from cellot.utils.helpers import symlink_to_logfile, write_metadata
 
 
 Pair = namedtuple("Pair", "source target")
@@ -34,9 +33,6 @@ def main(argv):
     yaml.dump(
         config.to_dict(), open(outdir / "config.yaml", "w"), default_flow_style=False
     )
-
-    symlink_to_logfile(outdir / "log")
-    write_metadata(outdir / "metadata.json", argv)
 
     cachedir = outdir / "cache"
     cachedir.mkdir(exist_ok=True)

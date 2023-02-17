@@ -1,6 +1,5 @@
 import cellot.models
 from cellot.data.cell import load_cell_data
-from cellot.data.toy import load_toy_data
 
 
 def load_data(config, **kwargs):
