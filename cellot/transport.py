@@ -1,6 +1,5 @@
 import anndata
 from torch.utils.data import DataLoader
-from cellot.models.popalign import transport_popalign
 
 
 def transport(config, model, dataset, return_as="anndata", dosage=None, **kwargs):
@@ -22,9 +21,6 @@ def transport(config, model, dataset, return_as="anndata", dosage=None, **kwargs
 
     elif name == "cae":
         outputs = transport_cae(model, inputs, target=config.data.target)
-
-    elif name == "popalign":
-        outputs = transport_popalign(model, inputs)
 
     else:
         raise ValueError

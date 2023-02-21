@@ -95,6 +95,15 @@ def patch_scgen_shift(config, model):
 
 
 def load_projectors(aedir, embedding, where):
+    if embedding is None:
+        def encode(df):
+            return df
+
+        def decode(df):
+            return df
+
+        return encode, decode
+
     config = load_config(aedir / "config.yaml")
     ae, *_, dataset = load(
         config,
@@ -139,13 +148,7 @@ def load_projectors(aedir, embedding, where):
             return pd.DataFrame(recon, index=df.index, columns=features)
 
     else:
-        assert embedding is None
-
-        def encode(df):
-            return df
-
-        def decode(df):
-            return df
+        raise ValueError
 
     return encode, decode
 

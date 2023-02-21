@@ -9,9 +9,6 @@ from cellot.utils.evaluate import (
 from cellot.losses.mmd import mmd_distance
 from cellot.utils import load_config
 from cellot.data.cell import read_single_anndata
-import jax.numpy as jnp
-from ott.core import sinkhorn
-from ott.geometry import pointcloud
 
 
 FLAGS = flags.FLAGS
@@ -24,8 +21,6 @@ flags.DEFINE_string(
         'comma seperated list of integers')
 
 flags.DEFINE_integer('n_reps', 10, 'number of evaluation repetitions')
-flags.DEFINE_string('subset', None, 'Name of obs entry to use as subset.')
-flags.DEFINE_string('subset_name', None, 'Name of subset.')
 flags.DEFINE_string('embedding', None, 'specify embedding context')
 flags.DEFINE_string('evalprefix', None, 'override default prefix')
 
@@ -47,21 +42,6 @@ flags.DEFINE_string('subname', '', '')
 
 def compute_mmd_loss(lhs, rhs, gammas):
     return np.mean([mmd_distance(lhs, rhs, g) for g in gammas])
-
-
-def compute_wasserstein_loss(x, y, epsilon=0.1):
-    """Computes transport between x and y via Sinkhorn algorithm."""
-    a = jnp.ones(len(x)) / len(x)
-    b = jnp.ones(len(y)) / len(y)
-
-    # compute cost
-    geom_xy = pointcloud.PointCloud(x, y, epsilon=epsilon)
-
-    # solve ot problem
-    out_xy = sinkhorn.sinkhorn(geom_xy, a, b, max_iterations=100, min_iterations=10)
-
-    # return regularized ot cost
-    return out_xy.reg_ot_cost.item()
 
 
 def compute_pairwise_corrs(df):
@@ -94,9 +74,7 @@ def compute_evaluations(iterator):
 
         if treated.shape[1] < 1000:
             mmd = compute_mmd_loss(treated, imputed, gammas=gammas)
-            w2 = compute_wasserstein_loss(treated.values, imputed.values)
             yield ncells, nfeatures, 'mmd', mmd
-            yield ncells, nfeatures, 'w2', w2
 
             knn, enrichment = compute_knn_enrichment(imputed, treated)
             k50 = enrichment.iloc[:, :50].values.mean()
@@ -110,8 +88,6 @@ def main(argv):
     expdir = Path(FLAGS.outdir)
     setting = FLAGS.setting
     where = FLAGS.where
-    subset = FLAGS.subset
-    subset_name = FLAGS.subset_name
     embedding = FLAGS.embedding
     prefix = FLAGS.evalprefix
     n_reps = FLAGS.n_reps
@@ -126,15 +102,7 @@ def main(argv):
     all_ncells = [int(x) for x in FLAGS.n_cells.split(',')]
 
     if prefix is None:
-        if subset is None:
-            prefix = f'stability_check-evals_{setting}_{where}'
-        else:
-            assert subset is not None
-            prefix = f'stability_check-evals_{setting}_{where}_{subset}_{subset_name}'
-
-        if len(FLAGS.subname) > 0:
-            prefix = prefix + '/' + FLAGS.subname
-
+        prefix = f'evals_{setting}_{where}'
     outdir = expdir / prefix
 
     outdir.mkdir(exist_ok=True, parents=True)
