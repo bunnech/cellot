@@ -109,6 +109,7 @@ def main(argv):
 
     def iterate_feature_slices():
 
+        assert (expdir / 'config.yaml').exists()
         config = load_config(expdir / 'config.yaml')
         if 'ae_emb' in config.data:
             assert config.model.name == 'cellot'
