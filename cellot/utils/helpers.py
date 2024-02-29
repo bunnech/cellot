@@ -15,6 +15,7 @@ def load_config(path, unparsed=None):
     if path.exists():
         config = ConfigDict(yaml.load(open(path, "r"), yaml.SafeLoader))
     else:
+        print("WARNING: config path not found")
         config = ConfigDict()
 
     if unparsed is not None:
