@@ -1,14 +1,16 @@
-from tqdm.auto import tqdm
-import pandas as pd
-from cellot.losses.mmd import mmd_distance
-from sklearn.neighbors import NearestNeighbors
 from copy import deepcopy
+
 import anndata
+import pandas as pd
 import torch
-from cellot.utils.loaders import load_data, load_model, load
-from cellot.utils import load_config
+from sklearn.neighbors import NearestNeighbors
+from tqdm.auto import tqdm
+
+from cellot.losses.mmd import mmd_distance
 from cellot.models.ae import compute_scgen_shift
 from cellot.transport import transport
+from cellot.utils import load_config
+from cellot.utils.loaders import load, load_data, load_model
 
 
 def compute_knn_enrichment(pushfwd, treated, return_joint=False, ncells=None):
@@ -58,7 +60,6 @@ def compute_drug_signature_differences(control, treated, pushfwd):
 def compute_mmd_df(
     target, transport, gammas=None, subsample=False, ncells=None, nreps=5
 ):
-
     if gammas is None:
         gammas = [2, 1, 0.5, 0.1, 0.01, 0.005]
     gammas = list(gammas)
@@ -96,6 +97,7 @@ def patch_scgen_shift(config, model):
 
 def load_projectors(aedir, embedding, where):
     if embedding is None:
+
         def encode(df):
             return df
 
@@ -154,7 +156,6 @@ def load_projectors(aedir, embedding, where):
 
 
 def read_embedding_context(config):
-
     embedding = None
     if "ae_emb" in config.data:
         embedding = "ae"
@@ -260,14 +261,13 @@ def grab_treated_cells_for_random_model(config, setting):
         cells = dataset["target"].adata.to_df()
 
     cells = cells.sample(frac=1, random_state=1)
-    treated, imputed = cells.iloc[
-        : len(cells) // 2], cells.iloc[len(cells) // 2:]
+    treated, imputed = cells.iloc[: len(cells) // 2], cells.iloc[len(cells) // 2 :]
 
     return treated, imputed
 
 
 def load_conditions(expdir, where, setting, embedding=None):
-    if embedding is None:
+    if embedding is None and (expdir.parent / "model-cellot" / "config.yaml").exists():
         embedding = read_embedding_context(
             load_config(expdir.parent / "model-cellot" / "config.yaml")
         )
@@ -323,8 +323,7 @@ def load_conditions(expdir, where, setting, embedding=None):
             and embedding == "ae"
             and where == "latent_space"
         ):
-            imputed = transport(
-                config, model, to_pushfwd, decode=False, return_as=None)
+            imputed = transport(config, model, to_pushfwd, decode=False, return_as=None)
 
             imputed = pd.DataFrame(
                 imputed.detach().numpy(), index=to_pushfwd.adata.obs_names
