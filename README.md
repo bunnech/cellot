@@ -1,8 +1,8 @@
-# [Learning Single-Cell Perturbation Responses using Neural Optimal Transport](https://www.researchsquare.com/article/rs-1805107/v1)
+# [Learning Single-Cell Perturbation Responses using Neural Optimal Transport]([https://www.researchsquare.com/article/rs-1805107/v1](https://www.nature.com/articles/s41592-023-01969-x))
 
 **Authors**: Charlotte Bunne\*, Stefan G. Stark\*, Gabriele Gut\*, Jacobo Sarabia Del Castillo, Mitch Levesque, Kjong-Van Lehmann, Lucas Pelkmans, Andreas Krause, Gunnar Rätsch
 
-The preprint is available [**here**](https://www.researchsquare.com/article/rs-1805107/v1).
+The Nature Method publication is available [**here**]([https://www.researchsquare.com/article/rs-1805107/v1](https://www.nature.com/articles/s41592-023-01969-x)).
 
 <p align='center'><img src='assets/overview.png' alt='Overview.' width='100%'> </p>
 
@@ -38,7 +38,7 @@ After downloading the dataset, the CellOT model can be trained via the `scripts/
 ```
 python ./scripts/train.py --outdir ./results/4i/drug-cisplatin/model-cellot --config ./configs/tasks/4i.yaml --config ./configs/models/cellot.yaml --config.data.target cisplatin
 ```
-All scripts to reproduce the experiments in the i.i.d. (independent-and-identically-distributed), o.o.s. (out-of-sample), and o.o.d. (out-of-distribution) setting can be found in `scripts/submit`. More details on the method and experiments can be found in the [preprint](https://www.biorxiv.org/content/10.1101/2021.12.15.472775v1.full.pdf).
+All scripts to reproduce the experiments in the i.i.d. (independent-and-identically-distributed), o.o.s. (out-of-sample), and o.o.d. (out-of-distribution) setting can be found in `scripts/submit`. More details on the method and experiments can be found in the [paper](https://www.nature.com/articles/s41592-023-01969-x).
 
 The training of CellOT on 4i data takes around 3 hours on CPU. Once trained, the model can be evaluated via:
 ```
@@ -50,12 +50,15 @@ The user can hereby choose if the model is evaluated in the `iid` or `ood` setti
 
 In case you found our work useful, please consider citing us:
 ```
-@article{bunne2021learning,
-  title={{Learning Single-Cell Perturbation Responses using Neural Optimal Transport}},
-  author={Bunne, Charlotte and Stark, Stefan G and Gut, Gabriele and del Castillo, Jacobo Sarabia, and Levesque, Mitch and Lehmann, Kjong-Van and Pelkmans, Lucas and Krause, Andreas and Ratsch, Gunnar},
-  journal={bioRxiv},
-  year={2021},
-  publisher={Cold Spring Harbor Laboratory}
+@article{bunne2023learning,
+  title={Learning single-cell perturbation responses using neural optimal transport},
+  author={Bunne, Charlotte and Stark, Stefan G and Gut, Gabriele and Del Castillo, Jacobo Sarabia and Levesque, Mitch and Lehmann, Kjong-Van and Pelkmans, Lucas and Krause, Andreas and R{\"a}tsch, Gunnar},
+  journal={Nature Methods},
+  volume={20},
+  number={11},
+  pages={1759--1768},
+  year={2023},
+  publisher={Nature Publishing Group US New York}
 }
 ```
 
