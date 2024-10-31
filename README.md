@@ -1,8 +1,8 @@
-# [Learning Single-Cell Perturbation Responses using Neural Optimal Transport]([https://www.researchsquare.com/article/rs-1805107/v1](https://www.nature.com/articles/s41592-023-01969-x))
+# [Learning Single-Cell Perturbation Responses using Neural Optimal Transport](https://www.nature.com/articles/s41592-023-01969-x)
 
 **Authors**: Charlotte Bunne\*, Stefan G. Stark\*, Gabriele Gut\*, Jacobo Sarabia Del Castillo, Mitch Levesque, Kjong-Van Lehmann, Lucas Pelkmans, Andreas Krause, Gunnar Rätsch
 
-The Nature Method publication is available [**here**]([https://www.researchsquare.com/article/rs-1805107/v1](https://www.nature.com/articles/s41592-023-01969-x)).
+The Nature Method publication is available [**here**](https://www.nature.com/articles/s41592-023-01969-x).
 
 <p align='center'><img src='assets/overview.png' alt='Overview.' width='100%'> </p>
 
@@ -63,4 +63,4 @@ In case you found our work useful, please consider citing us:
 ```
 
 ## Contact
-In case you have questions, please contact [Stefan G. Stark](mailto:starks@ethz.ch) and [Charlotte Bunne](mailto:bunnec@ethz.ch).
+In case you have questions, please contact us via the Github Issues.
